@@ -1,5 +1,17 @@
 from pygame import *
+import pygame
 
+speed_x = 2
+speed_y = 2
+
+
+font.init()
+
+font1 = font.Font(None, 35)
+lose1 = font1.render("PLAYER 1 LOSE", True, (180, 0, 0))
+
+font2 = font.Font(None, 35)
+lose2 = font2.render("PLAYER 2 LOSE", True, (180, 0, 0))
 
 class GameSprite(sprite.Sprite):
     def __init__(self, player_image, player_x, player_y, player_speed, wight, height):
@@ -21,15 +33,15 @@ class Player(GameSprite):
         if keys[K_DOWN] and self.rect.y < win_height - 80:
             self.rect.y += self.speed  
                    
-    def update_1(self):
+    def update_l(self):
         keys = key.get_pressed()
         if keys[K_w] and self.rect.y > 5:
             self.rect.y -= self.speed
         if keys[K_s] and self.rect.y < win_height - 80:
             self.rect.y += self.speed
                 
-background_color = (0,0,0)                    
-win_width = 600
+background_color = (250,255,255)                    
+win_width = 1000
 win_height = 500
 window = display.set_mode((win_width, win_height))         
 window.fill(background_color)  
@@ -40,7 +52,7 @@ clock = time.Clock()
 fps = 60
 
 racket1 = Player('racket.png', 30, 200, 4, 50, 150)
-racket2 = Player('racket.png', 520, 200, 4, 50, 150)
+racket2 = Player('racket.png', 920, 200, 4, 50, 150)
 ball = Player('tennis bol.png', 200, 200, 4, 50, 50)  
 
 while game:
@@ -49,9 +61,29 @@ while game:
             game = False
     
     if finish != True:
+        window.fill(background_color)
         racket1.reset()
-        racket2.reset()  
+        racket1.update_l()
+        racket2.reset() 
+        racket2.update_r() 
         ball.reset()
-               
+        
+        ball.rect.x += speed_x
+        ball.rect.y += speed_y  
+    
+    if ball.rect.y > win_height - 50 or ball.rect.y < 0:
+        speed_y *= -1
+    
+    if sprite.collide_rect(racket1, ball) or sprite.collide_rect(racket2, ball):
+        speed_x *= -1
+    
+    if ball.rect.x < 0:
+        finish = True
+        window.blit(lose1, (200,200))
+    
+    if ball.rect.x > 1000:
+        finish = True
+        window.blit(lose2, (200,200))
+                      
     display.update()
     clock.tick()        
